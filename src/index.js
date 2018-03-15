@@ -1,4 +1,4 @@
-const CYPRESS_SCREENSHOT_FOLDER = 'cypress/screenshots';
+const CYPRESS_SCREENSHOT_FOLDER = 'cypress\\screenshots';
 
 /**
  * Creates unique id strings
@@ -30,12 +30,12 @@ function takeScreenshot (name) {
   const id = uuid();
   cy.screenshot(id, { log: false });
   cy.exec(
-    `mv ${CYPRESS_SCREENSHOT_FOLDER}/${id}.png "${CYPRESS_SCREENSHOT_FOLDER}/${name}.png"`,
+    `move ${CYPRESS_SCREENSHOT_FOLDER}\\${id}.png "${CYPRESS_SCREENSHOT_FOLDER}\\${name}.png"`,
     { log: false }
   );
   cy.exec(
     `cypress-crop-screenshot ` +
-      `--path="${CYPRESS_SCREENSHOT_FOLDER}/${name}.png" ` +
+      `--path="${CYPRESS_SCREENSHOT_FOLDER}\\${name}.png" ` +
       `--top=${frame.top} ` +
       `--left=${frame.left} ` +
       `--width=${frame.width} ` +
@@ -62,19 +62,19 @@ function matchScreenshot (name, options = {}) {
   console.log('Taking screenshot');
 
   // Ensure that the screenshot folders exist
-  cy.exec(`mkdir -p ${CYPRESS_SCREENSHOT_FOLDER}/new`, { log: false });
-  cy.exec(`mkdir -p ${CYPRESS_SCREENSHOT_FOLDER}/diff`, { log: false });
+  cy.exec(`if not exist ${CYPRESS_SCREENSHOT_FOLDER}\\new mkdir ${CYPRESS_SCREENSHOT_FOLDER}\\new`, { log: false });
+  cy.exec(`if not exist ${CYPRESS_SCREENSHOT_FOLDER}\\diff mkdir ${CYPRESS_SCREENSHOT_FOLDER}\\diff`, { log: false });
 
   // we need to touch the old file for the first run,
   // we'll check later if the file actually has any content
   // in it or not
-  cy.exec(`touch "${CYPRESS_SCREENSHOT_FOLDER}/${fileName}.png"`, {
+  cy.exec(`type NUL >> "${CYPRESS_SCREENSHOT_FOLDER}/${fileName}.png"`, {
     log: false
   });
 
-  takeScreenshot(`new/${fileName}`);
+  takeScreenshot(`new\\${fileName}`);
   cy
-    .readFile(`${CYPRESS_SCREENSHOT_FOLDER}/${fileName}.png`, 'utf-8', {
+    .readFile(`${CYPRESS_SCREENSHOT_FOLDER}\\${fileName}.png`, 'utf-8', {
       log: false
     })
     .then((value) => {
@@ -83,9 +83,9 @@ function matchScreenshot (name, options = {}) {
         cy
           .exec(
             `cypress-diff-screenshot ` +
-              `--pathOld="${CYPRESS_SCREENSHOT_FOLDER}/${fileName}.png" ` +
-              `--pathNew="${CYPRESS_SCREENSHOT_FOLDER}/new/${fileName}.png" ` +
-              `--target="${CYPRESS_SCREENSHOT_FOLDER}/diff/${fileName}.png"`,
+              `--pathOld="${CYPRESS_SCREENSHOT_FOLDER}\\${fileName}.png" ` +
+              `--pathNew="${CYPRESS_SCREENSHOT_FOLDER}\\new\\${fileName}.png" ` +
+              `--target="${CYPRESS_SCREENSHOT_FOLDER}\\diff\\${fileName}.png"`,
             { log: false }
           )
           .then((result) => {
@@ -93,16 +93,16 @@ function matchScreenshot (name, options = {}) {
             const matches = result.stdout === 'Yay';
             assert.isTrue(matches, 'Screenshots match');
             cy.exec(
-              `mv "${CYPRESS_SCREENSHOT_FOLDER}/new/${fileName}.png" ` +
-                `"${CYPRESS_SCREENSHOT_FOLDER}/${fileName}.png"`,
+              `move "${CYPRESS_SCREENSHOT_FOLDER}\\new\\${fileName}.png" ` +
+                `"${CYPRESS_SCREENSHOT_FOLDER}\\${fileName}.png"`,
               { log: false }
             );
           });
       } else {
         console.log('No previous screenshot found! Match passed!');
         cy.exec(
-          `mv "${CYPRESS_SCREENSHOT_FOLDER}/new/${fileName}.png" ` +
-            `"${CYPRESS_SCREENSHOT_FOLDER}/${fileName}.png"`,
+          `move "${CYPRESS_SCREENSHOT_FOLDER}\\new\\${fileName}.png" ` +
+            `"${CYPRESS_SCREENSHOT_FOLDER}\\${fileName}.png"`,
           { log: false }
         );
       }
